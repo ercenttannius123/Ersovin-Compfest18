@@ -87,6 +87,39 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+/* Mode Toggle */
+.mode-toggle {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  border-bottom: 2px solid #e5e7eb;
+  padding-bottom: 1rem;
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 0.75rem 1.5rem;
+  background: #f3f4f6;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #6b7280;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-btn:hover {
+  background: #e5e7eb;
+  color: #1f2937;
+}
+
+.toggle-btn.active {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-color: #667eea;
+}
+
 .upload-area {
   border: 2px dashed #cbd5e1;
   border-radius: 12px;
@@ -146,6 +179,11 @@
   transform: translateY(-2px);
 }
 
+.upload-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
 .upload-loading {
   display: flex;
   flex-direction: column;
@@ -171,6 +209,75 @@
 .upload-loading p {
   color: #667eea;
   font-weight: 600;
+}
+
+/* Camera Section */
+.camera-section {
+  margin: 2rem 0;
+  background: #f8fafc;
+  border-radius: 12px;
+  padding: 2rem;
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.camera-start {
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+.camera-icon {
+  font-size: 3rem;
+  margin-bottom: 0.5rem;
+}
+
+.camera-start h3 {
+  font-size: 1.5rem;
+  color: #1f2937;
+  margin-bottom: 0.5rem;
+}
+
+.camera-start p {
+  color: #6b7280;
+  margin-bottom: 1.5rem;
+}
+
+.camera-error {
+  color: #dc2626;
+  font-size: 0.9rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fee2e2;
+  border-radius: 6px;
+}
+
+.camera-active {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.camera-video {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+  border-radius: 12px;
+  background: #000;
+  object-fit: cover;
+}
+
+.camera-controls {
+  display: flex;
+  gap: 1rem;
+  width: 100%;
+  max-width: 500px;
 }
 
 .upload-hints {
@@ -200,10 +307,9 @@
 }
 
 .upload-hints li:before {
-  content: '✓';
+  content: '';
   position: absolute;
   left: 0;
-  font-weight: bold;
 }
 
 /* Result Section */
