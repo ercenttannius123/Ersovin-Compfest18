@@ -6,7 +6,7 @@ Sistem deteksi cacat kain menggunakan Deep Learning (EfficientNet-B0) dengan API
 
 **FabriScan** adalah solusi AI-powered untuk mendeteksi cacat pada kain secara otomatis. Sistem ini menggunakan:
 - **Backend**: FastAPI + PyTorch + EfficientNet-B0
-- **Frontend**: React + TypeScript (coming soon)
+- **Frontend**: React + TypeScript
 - **Model**: Deep Learning classifier untuk deteksi defect
 
 ## 📁 Project Structure
@@ -21,9 +21,12 @@ Ersovin-Fabriscan/
 │   ├── requirements.txt      # Dependencies
 │   └── README.md            # Setup guide backend
 │
-├── frontend/                # React Application (TBD)
+├── frontend/                # React frontend
 │   ├── src/
+│   ├── public/
 │   ├── package.json
+│   ├── tsconfig.json
+│   ├── vite.config.ts
 │   └── README.md
 │
 ├── Pelengkap/              # Supporting files
@@ -47,7 +50,13 @@ uvicorn main:app --reload --host 0.0.0.0 --port 8000
 API akan berjalan di `http://localhost:8000`
 
 ### Frontend
-(Coming soon)
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Aplikasi frontend akan berjalan di `http://localhost:5173`
 
 ## 📚 Dokumentasi
 
