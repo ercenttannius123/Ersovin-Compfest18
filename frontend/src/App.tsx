@@ -21,7 +21,6 @@ function App() {
     setError(null)
     setPrediction(null)
 
-    // Preview image
     const reader = new FileReader()
     reader.onload = (e) => {
       setUploadedImage(e.target?.result as string)
@@ -44,7 +43,7 @@ function App() {
       const data: PredictionData = await response.json()
       setPrediction(data)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'An error occurred')
+      setError(err instanceof Error ? err.message : 'An error occurred while processing the image.')
       setUploadedImage(null)
     } finally {
       setLoading(false)
@@ -61,24 +60,27 @@ function App() {
     <div className="app">
       <Header />
       <main className="container">
+        <section className="hero-card">
+          <h2>Fabric defect detection with one simple flow</h2>
+          <p>Upload a fabric image or capture it with your camera, then review the AI result.</p>
+        </section>
+
+        {error && (
+          <div className="error-message">
+            <span className="error-icon">⚠️</span>
+            {error}
+          </div>
+        )}
+
         <div className="content">
           {!prediction ? (
-            <ImageUpload onUpload={handleImageUpload} loading={loading} />
+            <ImageUpload onUpload={handleImageUpload} loading={loading} onError={setError} />
           ) : (
-            <>
-              <PredictionResult
-                prediction={prediction}
-                image={uploadedImage}
-                onReset={handleReset}
-              />
-            </>
-          )}
-
-          {error && (
-            <div className="error-message">
-              <span className="error-icon">⚠️</span>
-              {error}
-            </div>
+            <PredictionResult
+              prediction={prediction}
+              image={uploadedImage}
+              onReset={handleReset}
+            />
           )}
         </div>
       </main>

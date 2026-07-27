@@ -13,7 +13,8 @@ interface PredictionResultProps {
 }
 
 function PredictionResult({ prediction, image, onReset }: PredictionResultProps) {
-  const confidencePercentage = (prediction.confidence * 100).toFixed(1)
+  const confidenceValue = Math.max(0, Math.min(Number(prediction.confidence), 100))
+  const confidencePercentage = confidenceValue.toFixed(1)
   const isDefect = prediction.is_defect
   const statusColor = isDefect ? '#ef4444' : '#10b981'
   const statusIcon = isDefect ? '⚠️' : '✓'
@@ -22,12 +23,10 @@ function PredictionResult({ prediction, image, onReset }: PredictionResultProps)
     <div className="result-section">
       <div className="result-container">
         <div className="result-image-area">
-          {image && (
-            <img 
-              src={image} 
-              alt="Uploaded fabric" 
-              className="result-image"
-            />
+          {image ? (
+            <img src={image} alt="Uploaded fabric" className="result-image" />
+          ) : (
+            <div className="image-placeholder">No image preview available</div>
           )}
         </div>
 
@@ -55,7 +54,7 @@ function PredictionResult({ prediction, image, onReset }: PredictionResultProps)
                   <div
                     className="confidence-bar"
                     style={{
-                      width: `${prediction.confidence * 100}%`,
+                      width: `${confidenceValue}%`,
                       backgroundColor: statusColor,
                     }}
                   ></div>
@@ -68,8 +67,8 @@ function PredictionResult({ prediction, image, onReset }: PredictionResultProps)
               <label>Interpretation</label>
               <p className="detail-description">
                 {isDefect
-                  ? 'This fabric sample has been identified as containing defects. Recommended action: Review and categorize the defect type.'
-                  : 'This fabric sample appears to be defect-free. Quality check passed.'}
+                  ? 'Sample terdeteksi mengandung cacat. Lakukan pemeriksaan lebih lanjut dan kategorikan jenis cacat.'
+                  : 'Sample kain terlihat bebas cacat. Proses quality check berhasil.'}
               </p>
             </div>
           </div>
@@ -77,9 +76,6 @@ function PredictionResult({ prediction, image, onReset }: PredictionResultProps)
           <div className="result-actions">
             <button className="btn btn-primary" onClick={onReset}>
               Analyze Another Image
-            </button>
-            <button className="btn btn-secondary">
-              Export Result
             </button>
           </div>
         </div>
