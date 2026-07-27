@@ -1,150 +1,91 @@
-# FabriScan Backend - Fabric Defect Detection API
+# FabriScan - Fabric Defect Detection System
 
-Backend API untuk sistem deteksi cacat kain menggunakan Deep Learning dengan model EfficientNet-B0.
+Sistem deteksi cacat kain menggunakan Deep Learning (EfficientNet-B0) dengan API FastAPI dan Frontend React.
 
-## 📋 Prasyarat
+## 🎯 Tentang Proyek
 
-- Python 3.8+
-- pip atau conda untuk package management
+**FabriScan** adalah solusi AI-powered untuk mendeteksi cacat pada kain secara otomatis. Sistem ini menggunakan:
+- **Backend**: FastAPI + PyTorch + EfficientNet-B0
+- **Frontend**: React + TypeScript (coming soon)
+- **Model**: Deep Learning classifier untuk deteksi defect
 
-## 🚀 Setup Guide
+## 📁 Project Structure
 
-### 1. Clone Repository (Jika belum)
+```
+Ersovin-Fabriscan/
+├── backend/                  # API FastAPI
+│   ├── main.py              # Aplikasi utama
+│   ├── model/
+│   │   ├── best_model.pth   # Model terlatih
+│   │   └── class_names.json # Daftar class
+│   ├── requirements.txt      # Dependencies
+│   └── README.md            # Setup guide backend
+│
+├── frontend/                # React Application (TBD)
+│   ├── src/
+│   ├── package.json
+│   └── README.md
+│
+├── Pelengkap/              # Supporting files
+│   ├── confusion_matrix.png
+│   └── training_history.png
+│
+├── kaggle.json             # (⚠️ NOT PUSHED - add to .env locally)
+├── .gitignore
+└── README.md               # File ini
+```
+
+## 🚀 Quick Start
+
+### Backend
 ```bash
-git clone <repository-url>
 cd backend
-```
-
-### 2. Buat Virtual Environment (Recommended)
-```bash
-# Windows
-python -m venv venv
-venv\Scripts\activate
-
-# macOS/Linux
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### 3. Install Dependencies
-```bash
 pip install -r requirements.txt
-```
-
-### 4. Pastikan Model Tersedia
-Periksa bahwa file berikut ada di folder `model/`:
-- `best_model.pth` - Model terlatih EfficientNet-B0
-- `class_names.json` - Daftar nama class untuk klasifikasi
-
-### 5. Jalankan Server
-```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Server akan berjalan di `http://localhost:8000`
+API akan berjalan di `http://localhost:8000`
 
-## 📚 API Endpoints
+### Frontend
+(Coming soon)
 
-### 1. Health Check
-```
-GET /
-```
-Response:
-```json
-{
-  "message": "FabriScan API is running!"
-}
-```
+## 📚 Dokumentasi
 
-### 2. Prediksi Cacat Kain
-```
-POST /predict
-Content-Type: multipart/form-data
-```
+- [Backend README](./backend/README.md) - Setup, API endpoints, troubleshooting
 
-**Parameter:**
-- `file` (required): File gambar kain dalam format JPG/PNG
+## 🧠 Model Details
 
-**Response:**
-```json
-{
-  "predicted_class": "defect free",
-  "confidence": 95.5,
-  "is_defect": false
-}
-```
+- **Architecture**: EfficientNet-B0 (transfer learning)
+- **Input**: Gambar kain 224x224 pixels  
+- **Output**: Klasifikasi + confidence score
+- **Training Data**: Kaggle Fabric Defect Detection Dataset
 
-## 🧪 Testing API
+## 🔒 Security
 
-### Menggunakan cURL
-```bash
-curl -X POST "http://localhost:8000/predict" \
-  -H "accept: application/json" \
-  -F "file=@path/to/your/image.jpg"
-```
+**⚠️ IMPORTANT:** 
+- `kaggle.json` contains sensitive credentials
+- File ini **TIDAK** dipush ke GitHub
+- Set di local machine saja atau gunakan environment variables
+- Jika exposed, regenerate API key di https://www.kaggle.com/settings/account
 
-### Menggunakan Python
-```python
-import requests
+## 📝 Commit Convention
 
-url = "http://localhost:8000/predict"
-with open("test_image.jpg", "rb") as f:
-    files = {"file": f}
-    response = requests.post(url, files=files)
-    print(response.json())
-```
+Project mengikuti **Conventional Commits**:
+- `feat:` - Fitur baru
+- `fix:` - Bug fix
+- `docs:` - Dokumentasi
+- `refactor:` - Perubahan struktur
+- `test:` - Testing
 
-### Menggunakan Swagger UI (FastAPI Built-in)
-Buka browser dan akses: `http://localhost:8000/docs`
+## 👥 Team
 
-## 🏗️ Project Structure
-```
-backend/
-├── main.py              # FastAPI aplikasi utama
-├── requirements.txt     # Dependencies
-├── model/
-│   ├── best_model.pth   # Model terlatih
-│   └── class_names.json # Nama-nama class
-└── README.md           # File ini
-```
-
-## 🔧 Konfigurasi
-
-### CORS Settings
-Saat ini CORS diatur untuk memungkinkan semua origin. Untuk production, ubah di `main.py`:
-```python
-allow_origins=["https://yourdomain.com"]
-```
-
-### Model Architecture
-- **Base Model**: EfficientNet-B0 (pre-trained)
-- **Input Size**: 224 x 224 pixels
-- **Output**: Klasifikasi multi-class dengan confidence score
-- **Dropout**: 0.3 untuk regularisasi
-
-## 📦 Dependencies Explanation
-- **fastapi**: Web framework modern untuk membangun API
-- **uvicorn**: ASGI server untuk menjalankan FastAPI
-- **torch**: PyTorch deep learning framework
-- **torchvision**: Computer vision utilities dengan pre-trained models
-- **pillow**: Image processing library
-- **python-multipart**: Untuk handling file upload di FastAPI
-
-## ⚠️ Troubleshooting
-
-### Error: "No module named 'torch'"
-```bash
-pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-```
-
-### Error: "Model file not found"
-Pastikan file `model/best_model.pth` ada di lokasi yang benar.
-
-### CORS Error di Frontend
-Pastikan server backend berjalan dengan CORS middleware yang benar.
+**Ersovin - Fabriscan**
+- Compfest 18
 
 ## 📝 License
-Private - Untuk keperluan kompetisi Ersovin Fabriscan
+
+Private - Untuk keperluan kompetisi
 
 ---
-Untuk dokumentasi lebih lanjut tentang FastAPI, kunjungi: https://fastapi.tiangolo.com/
+
+Last Updated: 2026-07-27
