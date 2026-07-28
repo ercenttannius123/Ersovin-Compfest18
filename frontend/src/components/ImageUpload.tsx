@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 
 interface ImageUploadProps {
   onUpload: (file: File) => void
@@ -12,10 +12,13 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const videoRef = useRef<HTMLVideoElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const readyCheckIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const [mode, setMode] = useState<InputMode>('upload')
   const [cameraActive, setCameraActive] = useState(false)
+  const [cameraReady, setCameraReady] = useState(false)
   const [cameraError, setCameraError] = useState<string | null>(null)
+  const [cameraStream, setCameraStream] = useState<MediaStream | null>(null)
 
   const handleFileClick = () => {
     fileInputRef.current?.click()
@@ -61,33 +64,135 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
     onUpload(file)
   }
 
+  const clearReadyCheck = () => {
+    if (readyCheckIntervalRef.current) {
+      clearInterval(readyCheckIntervalRef.current)
+      readyCheckIntervalRef.current = null
+    }
+  }
+
+  const handleVideoReady = () => {
+    console.log('[FabriScan] handleVideoReady terpanggil, cameraReady -> true')
+    setCameraReady(true)
+    clearReadyCheck()
+  }
+
   const startCamera = async () => {
+    console.log('[FabriScan] === startCamera dipanggil ===')
     try {
       setCameraError(null)
+      setCameraReady(false)
       onError('')
-      const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'environment' },
-        audio: false,
-      })
 
-      if (videoRef.current) {
-        videoRef.current.srcObject = stream
-        setCameraActive(true)
+      let stream: MediaStream | null = null
+
+      try {
+        console.log('[FabriScan] mencoba getUserMedia facingMode environment...')
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: { facingMode: { ideal: 'environment' } },
+          audio: false,
+        })
+        console.log('[FabriScan] berhasil dapat stream (environment):', stream)
+      } catch (envErr) {
+        console.log('[FabriScan] gagal environment, fallback ke video:true. Error:', envErr)
+        stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+          audio: false,
+        })
+        console.log('[FabriScan] berhasil dapat stream (fallback):', stream)
       }
+
+      // PENTING: elemen <video> baru ada di DOM setelah cameraActive
+      // jadi true (lihat JSX di bawah, video cuma dirender kalau
+      // cameraActive === true). Jadi di sini kita CUMA simpan stream-nya
+      // ke state dulu dan set cameraActive true. Assignment ke
+      // videoRef.current dipindah ke useEffect terpisah yang jalan
+      // setelah React selesai me-render elemen video-nya.
+      console.log('[FabriScan] menyimpan stream ke state, mengaktifkan cameraActive')
+      setCameraStream(stream)
+      setCameraActive(true)
     } catch (error) {
+      console.error('[FabriScan] startCamera gagal total, masuk catch luar:', error)
       const errorMsg = error instanceof Error ? error.message : 'Akses kamera ditolak.'
       setCameraError(errorMsg)
     }
   }
 
-  const stopCamera = () => {
-    if (videoRef.current?.srcObject) {
-      const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
-      tracks.forEach((track) => track.stop())
-      videoRef.current.srcObject = null
-      setCameraActive(false)
+  // Efek ini yang benar-benar nyambungin stream ke elemen <video>.
+  // Jalan setiap kali cameraActive atau cameraStream berubah, dan di
+  // titik ini videoRef.current dijamin sudah terisi karena elemen
+  // video sudah pasti ke-render (cameraActive sudah true).
+  useEffect(() => {
+    if (!cameraActive || !cameraStream || !videoRef.current) {
+      console.log('[FabriScan] effect assign stream: syarat belum lengkap', {
+        cameraActive,
+        hasStream: !!cameraStream,
+        hasVideoRef: !!videoRef.current,
+      })
+      return
     }
+
+    const video = videoRef.current
+    console.log('[FabriScan] effect assign stream: video element ditemukan, assign srcObject')
+
+    video.srcObject = cameraStream
+    video.muted = true
+    video.playsInline = true
+
+    video.addEventListener('loadedmetadata', handleVideoReady, { once: true })
+    video.addEventListener('canplay', handleVideoReady, { once: true })
+    video.addEventListener('playing', handleVideoReady, { once: true })
+
+    video.play()
+      .then(() => console.log('[FabriScan] video.play() berhasil'))
+      .catch((playError) => console.warn('[FabriScan] video.play() gagal (autoplay blocked?):', playError))
+
+    if (video.readyState >= 3 || video.videoWidth > 0) {
+      console.log('[FabriScan] video sudah ready langsung, readyState:', video.readyState, 'videoWidth:', video.videoWidth)
+      setCameraReady(true)
+    } else {
+      console.log('[FabriScan] video belum ready, mulai polling fallback...')
+      clearReadyCheck()
+      let attempts = 0
+      readyCheckIntervalRef.current = setInterval(() => {
+        attempts += 1
+        if (videoRef.current && videoRef.current.videoWidth > 0) {
+          console.log('[FabriScan] polling berhasil dapat videoWidth:', videoRef.current.videoWidth, 'di attempt ke-', attempts)
+          setCameraReady(true)
+          clearReadyCheck()
+        } else if (attempts > 30) {
+          console.warn('[FabriScan] polling menyerah setelah 30 attempt, videoWidth masih 0')
+          clearReadyCheck()
+        }
+      }, 150)
+    }
+
+    return () => {
+      video.removeEventListener('loadedmetadata', handleVideoReady)
+      video.removeEventListener('canplay', handleVideoReady)
+      video.removeEventListener('playing', handleVideoReady)
+    }
+  }, [cameraActive, cameraStream])
+
+  const stopCamera = () => {
+    clearReadyCheck()
+    const stream = cameraStream || (videoRef.current?.srcObject as MediaStream | null)
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop())
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null
+    }
+    setCameraActive(false)
+    setCameraReady(false)
+    setCameraStream(null)
   }
+
+  useEffect(() => {
+    return () => {
+      clearReadyCheck()
+    }
+  }, [])
 
   const capturePhoto = () => {
     if (!videoRef.current || !canvasRef.current) return
@@ -98,9 +203,11 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
       return
     }
 
-    canvasRef.current.width = videoRef.current.videoWidth
-    canvasRef.current.height = videoRef.current.videoHeight
-    context.drawImage(videoRef.current, 0, 0)
+    const width = videoRef.current.videoWidth || 640
+    const height = videoRef.current.videoHeight || 480
+    canvasRef.current.width = width
+    canvasRef.current.height = height
+    context.drawImage(videoRef.current, 0, 0, width, height)
 
     canvasRef.current.toBlob((blob) => {
       if (!blob) {
@@ -200,8 +307,33 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
             </div>
           ) : (
             <div className="camera-active">
-              <video ref={videoRef} autoPlay playsInline className="camera-video" />
+              <div className="camera-preview">
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  muted
+                  playsInline
+                  className="camera-video"
+                />
+                {!cameraReady && (
+                  <div className="camera-preview-overlay">
+                    <p>Memuat preview kamera... Tunggu sampai video muncul.</p>
+                  </div>
+                )}
+                {cameraReady && (
+                  <div className="camera-preview-frame">
+                    <span>Live Preview</span>
+                  </div>
+                )}
+              </div>
               <canvas ref={canvasRef} style={{ display: 'none' }} />
+              <div className="camera-status">
+                {cameraReady ? (
+                  <p>Camera ready. Arahkan kain di depan kamera lalu tekan Capture.</p>
+                ) : (
+                  <p>Menunggu kamera siap... Pastikan izin kamera sudah diberikan.</p>
+                )}
+              </div>
               <div className="camera-controls">
                 <button
                   type="button"
@@ -209,15 +341,15 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
                   onClick={stopCamera}
                   disabled={loading}
                 >
-                  Cancel
+                  Stop Camera
                 </button>
                 <button
                   type="button"
                   className="btn btn-primary"
                   onClick={capturePhoto}
-                  disabled={loading}
+                  disabled={loading || !cameraReady}
                 >
-                  {loading ? 'Analyzing...' : 'Capture'}
+                  {loading ? 'Analyzing...' : 'Capture Photo'}
                 </button>
               </div>
             </div>

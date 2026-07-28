@@ -44,7 +44,9 @@ body {
   font-weight: 800;
   background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
   -webkit-background-clip: text;
+  background-clip: text;
   -webkit-text-fill-color: transparent;
+  color: transparent;
   margin-bottom: 0.35rem;
 }
 
@@ -209,8 +211,6 @@ body {
 
 .upload-button,
 .btn {
-  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-  color: white;
   border: none;
   padding: 0.8rem 1.5rem;
   border-radius: 12px;
@@ -230,6 +230,8 @@ body {
 .btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .upload-loading {
@@ -258,6 +260,10 @@ body {
   color: #4338ca;
   font-weight: 700;
 }
+
+/* ============================= */
+/* Camera section (deduplicated) */
+/* ============================= */
 
 .camera-section {
   margin: 1rem 0;
@@ -295,9 +301,9 @@ body {
 
 .camera-error {
   color: #b91c1c;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   margin-top: 0.75rem;
-  padding: 0.85rem 1rem;
+  padding: 0.75rem 1rem;
   background: #fee2e2;
   border-radius: 10px;
   max-width: 360px;
@@ -311,28 +317,114 @@ body {
   align-items: center;
 }
 
-.camera-video {
+/* Wrapper video kamera. position: relative wajib ada di sini,
+   soalnya overlay & badge "Live Preview" nempel absolute ke elemen ini. */
+.camera-preview {
+  position: relative;
   width: 100%;
   max-width: 520px;
-  aspect-ratio: 4 / 3;
   border-radius: 18px;
+  overflow: hidden;
   background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  border: 1px solid #cbd5e1;
+}
+
+/* Satu-satunya definisi .camera-video. Dimensi & object-fit eksplisit
+   supaya video nggak collapse ke ukuran 0 atau ketutup elemen lain. */
+.camera-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
   object-fit: cover;
+  background: #000;
+}
+
+/* Overlay ini cuma nutupin video selama cameraReady === false.
+   Dia posisinya absolute relatif ke .camera-preview, jadi begitu
+   cameraReady jadi true, komponen React bakal unmount overlay ini
+   dan video kelihatan normal. */
+.camera-preview-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.65);
+  color: #f8fafc;
+  text-align: center;
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.camera-preview-overlay p {
+  max-width: 320px;
+  margin: 0;
+}
+
+.camera-preview-frame {
+  position: absolute;
+  top: 0.75rem;
+  left: 0.75rem;
+  padding: 0.35rem 0.75rem;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.85);
+  color: #111827;
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.camera-status {
+  margin-top: 0.85rem;
+  background: #eef2ff;
+  color: #1d4ed8;
+  border: 1px solid #c7d2fe;
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  max-width: 520px;
+  font-size: 0.95rem;
 }
 
 .camera-controls {
   display: flex;
-  gap: 1rem;
+  flex-wrap: wrap;
+  gap: 0.85rem;
+  justify-content: center;
+  margin-top: 1rem;
   width: 100%;
   max-width: 520px;
 }
 
+/* ============================= */
+/* Buttons (single source)       */
+/* ============================= */
+
+.btn-primary,
+.upload-button {
+  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
+  color: white;
+}
+
+.btn-secondary {
+  background: #e2e8f0;
+  color: #1f2937;
+}
+
+/* ============================= */
+/* Upload hints (single source)  */
+/* ============================= */
+
 .upload-hints {
-  background: #eef2ff;
   border-left: 4px solid #4f46e5;
   padding: 1.25rem;
   border-radius: 12px;
   margin-top: 1rem;
+  background: #eef2ff;
 }
 
 .upload-hints h4 {
@@ -361,6 +453,10 @@ body {
   left: 0;
   color: #4f46e5;
 }
+
+/* ============================= */
+/* Result section (single source)*/
+/* ============================= */
 
 .result-section {
   background: white;
@@ -423,6 +519,7 @@ body {
   border: 2px solid;
   border-radius: 14px;
   background: rgba(255, 255, 255, 0.76);
+  white-space: nowrap;
 }
 
 .status-icon {
@@ -502,9 +599,15 @@ body {
   gap: 1rem;
 }
 
-.btn-primary {
-  background: linear-gradient(135deg, #4f46e5 0%, #9333ea 100%);
-  color: white;
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  flex: 1;
 }
 
 .btn-secondary {
@@ -532,6 +635,10 @@ body {
 .error-icon {
   font-size: 1.25rem;
 }
+
+/* ============================= */
+/* Responsive                    */
+/* ============================= */
 
 @media (max-width: 992px) {
   .header-content {
@@ -572,6 +679,23 @@ body {
   .result-title {
     font-size: 1.5rem;
   }
+
+  .logo-section h1 {
+    font-size: 1.5rem;
+  }
+
+  .result-header {
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .result-actions {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -590,315 +714,9 @@ body {
   .btn {
     width: 100%;
   }
-}
 
-.camera-error {
-  color: #dc2626;
-  font-size: 0.9rem;
-  margin-top: 1rem;
-  padding: 0.75rem;
-  background: #fee2e2;
-  border-radius: 6px;
-}
-
-.camera-active {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.camera-video {
-  width: 100%;
-  max-width: 500px;
-  height: auto;
-  border-radius: 12px;
-  background: #000;
-  object-fit: cover;
-}
-
-.camera-controls {
-  display: flex;
-  gap: 1rem;
-  width: 100%;
-  max-width: 500px;
-}
-
-.upload-hints {
-  background: #f0f9ff;
-  border-left: 4px solid #667eea;
-  padding: 1.25rem;
-  border-radius: 8px;
-  margin-top: 1rem;
-}
-
-.upload-hints h4 {
-  color: #1e40af;
-  margin-bottom: 0.5rem;
-  font-size: 0.875rem;
-}
-
-.upload-hints ul {
-  list-style: none;
-}
-
-.upload-hints li {
-  color: #3b82f6;
-  padding: 0.15rem 0;
-  padding-left: 1.5rem;
-  position: relative;
-  font-size: 0.85rem;
-}
-
-.upload-hints li:before {
-  content: '';
-  position: absolute;
-  left: 0;
-}
-
-/* Result Section */
-.result-section {
-  background: white;
-  border-radius: 16px;
-  padding: 1.75rem;
-  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
-}
-
-.result-container {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 3rem;
-  align-items: start;
-}
-
-.result-image-area {
-  background: #f8fafc;
-  border-radius: 12px;
-  padding: 1rem;
-  min-height: 300px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid #e2e8f0;
-}
-
-.result-image {
-  max-width: 100%;
-  max-height: 400px;
-  border-radius: 8px;
-  object-fit: contain;
-}
-
-.result-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  gap: 1.5rem;
-}
-
-.result-title {
-  font-size: 1.875rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.result-status {
-  display: flex;
-  align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem 1.25rem;
-  border: 2px solid;
-  border-radius: 8px;
-  background: rgba(255, 255, 255, 0.5);
-  white-space: nowrap;
-}
-
-.status-icon {
-  font-size: 1.25rem;
-}
-
-.status-text {
-  font-weight: 600;
-  font-size: 0.95rem;
-}
-
-.result-details {
-  display: flex;
-  flex-direction: column;
-  gap: 2rem;
-  margin-bottom: 2rem;
-}
-
-.detail-item {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.detail-item label {
-  font-size: 0.875rem;
-  font-weight: 600;
-  color: #6b7280;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-}
-
-.detail-value {
-  font-size: 1.25rem;
-  font-weight: 700;
-  color: #1f2937;
-}
-
-.detail-description {
-  font-size: 0.95rem;
-  color: #4b5563;
-  line-height: 1.6;
-}
-
-.confidence-display {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.confidence-bar-container {
-  flex: 1;
-  height: 8px;
-  background: #e5e7eb;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-.confidence-bar {
-  height: 100%;
-  border-radius: 4px;
-  transition: width 0.6s ease;
-}
-
-.confidence-text {
-  font-size: 1.125rem;
-  font-weight: 700;
-  color: #1f2937;
-  min-width: 4rem;
-  text-align: right;
-}
-
-/* Action Buttons */
-.result-actions {
-  display: flex;
-  gap: 1rem;
-}
-
-.btn {
-  padding: 0.75rem 1.5rem;
-  border: none;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.2s ease;
-  flex: 1;
-}
-
-.btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-}
-
-.btn-primary:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 10px 15px -3px rgba(102, 126, 234, 0.3);
-}
-
-.btn-secondary {
-  background: #f0f4ff;
-  color: #667eea;
-  border: 2px solid #667eea;
-}
-
-.btn-secondary:hover {
-  background: #e7ebff;
-}
-
-/* Error Message */
-.error-message {
-  background: #fee2e2;
-  border: 2px solid #ef4444;
-  color: #991b1b;
-  padding: 1.25rem;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  font-weight: 500;
-}
-
-.error-icon {
-  font-size: 1.25rem;
-}
-
-/* Responsive Design */
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    gap: 1rem;
-    text-align: center;
-  }
-
-  .logo-section h1 {
-    font-size: 1.5rem;
-  }
-
-  .container {
-    padding: 1rem;
-  }
-
-  .upload-section,
-  .result-section {
-    padding: 1.5rem;
-  }
-
-  .result-container {
-    grid-template-columns: 1fr;
-    gap: 2rem;
-  }
-
-  .result-header {
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .upload-area {
-    padding: 2rem;
-  }
-
-  .upload-icon {
-    font-size: 2rem;
-  }
-
-  .result-actions {
-    flex-direction: column;
-  }
-
-  .btn {
-    width: 100%;
-  }
-}
-
-@media (max-width: 480px) {
   .section-title {
     font-size: 1.5rem;
-  }
-
-  .section-description {
-    font-size: 1rem;
-  }
-
-  .upload-section,
-  .result-section {
-    padding: 1.25rem;
   }
 
   .result-image-area {
