@@ -2,7 +2,7 @@
 
 ![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
 
-Live demo: N/A · Model: EfficientNet-B0 · Frameworks: FastAPI, React
+Team: Ersovin · Model: EfficientNet-B0 · Frameworks: FastAPI, React
 
 ---
 
@@ -106,6 +106,8 @@ feat: add camera UI improvements
 fix: correct confidence display
 docs: update README
 ```
+
+Team: Ersovin — semua kontribusi dicantumkan atas nama tim.
 
 If you want commits normalized, I can run a small script to rewrite older messages (careful: rewriting history).
 
