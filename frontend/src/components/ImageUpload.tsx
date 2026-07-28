@@ -101,13 +101,6 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
         })
         console.log('[FabriScan] berhasil dapat stream (fallback):', stream)
       }
-
-      // PENTING: elemen <video> baru ada di DOM setelah cameraActive
-      // jadi true (lihat JSX di bawah, video cuma dirender kalau
-      // cameraActive === true). Jadi di sini kita CUMA simpan stream-nya
-      // ke state dulu dan set cameraActive true. Assignment ke
-      // videoRef.current dipindah ke useEffect terpisah yang jalan
-      // setelah React selesai me-render elemen video-nya.
       console.log('[FabriScan] menyimpan stream ke state, mengaktifkan cameraActive')
       setCameraStream(stream)
       setCameraActive(true)
@@ -117,11 +110,6 @@ function ImageUpload({ onUpload, onError, loading }: ImageUploadProps) {
       setCameraError(errorMsg)
     }
   }
-
-  // Efek ini yang benar-benar nyambungin stream ke elemen <video>.
-  // Jalan setiap kali cameraActive atau cameraStream berubah, dan di
-  // titik ini videoRef.current dijamin sudah terisi karena elemen
-  // video sudah pasti ke-render (cameraActive sudah true).
   useEffect(() => {
     if (!cameraActive || !cameraStream || !videoRef.current) {
       console.log('[FabriScan] effect assign stream: syarat belum lengkap', {
