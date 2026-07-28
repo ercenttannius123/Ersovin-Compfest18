@@ -1,85 +1,43 @@
-## Backend — FabriScan (FastAPI)
+# FabriScan Backend — FastAPI
 
-This document explains how to run the backend API locally, the expected folder layout, and common troubleshooting steps.
-
-Project layout (backend folder)
-# FabriScan — Backend (FastAPI)
-
-Backend API untuk FabriScan, menyediakan endpoint prediksi cacat kain menggunakan
-model PyTorch (EfficientNet-B0).
-
----
+Backend FastAPI untuk FabriScan menyediakan API prediksi cacat kain menggunakan model PyTorch.
 
 ## Prasyarat
 
 - Python 3.8+ (disarankan 3.9+)
 - pip
 
-## Cepat: Setup & Run
+## Cara Menjalankan
 
-1. Aktifkan environment dan install deps
+1. Masuk ke folder backend:
 
 ```bash
 cd backend
+```
+
+2. Buat virtual environment dan aktifkan:
+
+```bash
 python -m venv .venv
-# macOS / Linux
-source .venv/bin/activate
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
+```
+
+3. Pasang ketergantungan:
+
+```bash
 pip install -r requirements.txt
 ```
 
-2. Pastikan model ada di `backend/model/`:
-
-- `best_model.pth`
-- `class_names.json`
-
-3. Jalankan server (dev):
+4. Jalankan server:
 
 ```bash
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-Docs interaktif (Swagger UI): `http://localhost:8000/docs`
+5. Buka Swagger UI di `http://localhost:8000/docs`.
 
----
-
-## Endpoint utama
-
-- GET `/` — health check
-- POST `/predict` — upload gambar (multipart/form-data, field `file`)
-
-Contoh respons:
-
-```json
-{
-  "predicted_class": "defect free",
-  "confidence": 95.5,
-  "is_defect": false
-}
-```
-
-Contoh cURL:
-
-```bash
-curl -X POST "http://localhost:8000/predict" \
-  -F "file=@/path/to/image.jpg"
-```
-
-Contoh Python (requests):
-
-```python
-import requests
-
-url = "http://localhost:8000/predict"
-with open("test.jpg", "rb") as f:
-    resp = requests.post(url, files={"file": f})
-    print(resp.json())
-```
-
----
-
-## Struktur folder (backend)
+## Struktur Folder Backend
 
 ```
 backend/
@@ -90,30 +48,54 @@ backend/
     └── class_names.json
 ```
 
-> Catatan: `best_model.pth` dan file sensitif lain tidak termasuk di repo. Simpan
-> secara lokal atau di storage aman.
+> Catatan: `backend/model/best_model.pth` dan `class_names.json` tidak termasuk di repositori.
 
----
+## Endpoint
 
-## Konfigurasi & Tips
+- `GET /` — health check sederhana
+- `POST /predict` — upload gambar untuk prediksi
 
-- CORS: ubah `allow_origins` di `main.py` untuk production.
-- Jika tidak memiliki GPU, pastikan model di-load ke CPU (`map_location='cpu'`).
+### Request
 
-## Dependencies utama
+- Tipe: `multipart/form-data`
+- Field: `file` (gambar JPG/PNG/WebP)
 
-- `fastapi`, `uvicorn`, `torch`, `torchvision`, `pillow`, `python-multipart`
+### Contoh cURL
 
----
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -F "file=@/path/to/image.jpg"
+```
 
-## Troubleshooting singkat
+### Contoh respons
 
-- "No module named 'torch'": install torch untuk CPU
-  ```bash
-  pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
-  ```
-- "Model file not found": pastikan `backend/model/best_model.pth` ada
-- CORS errors: periksa `main.py` dan alamat origin yang diizinkan
+```json
+{
+  "predicted_class": "defect free",
+  "confidence": 95.5,
+  "is_defect": false
+}
+```
+
+## Konfigurasi Penting
+
+- CORS sudah diaktifkan untuk semua origin di `main.py` agar frontend dapat terhubung.
+- Model di-load ke CPU dengan `map_location='cpu'` agar berjalan di mesin tanpa GPU.
+
+## Dependencies Utama
+
+- `fastapi`
+- `uvicorn`
+- `torch`
+- `torchvision`
+- `pillow`
+- `python-multipart`
+
+## Troubleshooting
+
+- `No module named 'torch'`: install PyTorch sesuai platform.
+- `Model file not found`: pastikan `backend/model/best_model.pth` tersedia.
+- Error CORS: periksa pengaturan di `main.py`.
 
 ---
 
