@@ -1,3 +1,93 @@
+# FabriScan — Deteksi Cacat Kain
+
+![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
+Tim: Ersovin · Model: EfficientNet-B0 · Teknologi: FastAPI, React
+
+---
+## Tentang
+
+FabriScan adalah prototipe aplikasi untuk mendeteksi cacat pada kain secara otomatis. Sistem ini menggunakan model PyTorch yang dilayani oleh FastAPI dan antarmuka frontend React untuk mengambil gambar dan menampilkan hasil prediksi.
+## Fitur
+
+- Upload gambar atau ambil foto langsung dari kamera
+- Preview kamera dan alur capture di frontend
+- REST API untuk prediksi dengan nilai confidence
+## Struktur Proyek
+
+```
+Ersovin - Fabriscan/
+├── backend/                # FastAPI app dan file model
+│   ├── main.py
+│   └── model/
+├── frontend/               # Vite + React + TypeScript
+│   └── src/
+├── .gitignore
+└── README.md               # File ini
+```
+
+Catatan: `backend/model/best_model.pth` dan `kaggle.json` TIDAK disertakan di repo.
+## Quick Start (pengembangan)
+
+1) Jalankan backend (development):
+
+```bash
+cd backend
+python -m venv .venv
+# macOS / Linux
+source .venv/bin/activate
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
+```
+
+2) Jalankan frontend (development):
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+Buka frontend di `http://localhost:5173` dan backend di `http://localhost:8000`.
+## Contoh API
+
+Endpoint: `POST /predict` — gunakan form multipart field `file` (image)
+
+Contoh cURL:
+
+```bash
+curl -X POST "http://localhost:8000/predict" \
+	-F "file=@/path/to/image.jpg"
+```
+
+Contoh respons:
+
+```json
+{
+	"class": "hole",
+	"confidence": 92.3
+}
+```
+## Troubleshooting (singkat)
+
+- Preview kamera putih/blank: izinkan akses kamera di browser, tutup aplikasi lain yang menggunakan kamera, lalu reload halaman.
+- Error saat memuat model: pastikan `backend/model/best_model.pth` ada dan versi PyTorch kompatibel.
+- Masalah CORS: periksa konfigurasi CORS di `backend/main.py` (allowed origins).
+## Kontribusi & Pesan Commit
+
+Kami menggunakan gaya Conventional Commits sederhana. Untuk fitur gunakan `feat:`, untuk perbaikan `fix:` dan untuk dokumen `docs:`.
+
+Contoh pesan commit:
+
+```
+feat: perbaikan UI kamera
+fix: koreksi tampilan confidence
+docs: perbarui README
+```
+
+Catatan: bila ingin menormalkan pesan commit lama, itu memerlukan rewrite history (hati-hati).
+Last updated: 2026-07-28
 # FabriScan — Fabric Defect Detection
 
 ![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
