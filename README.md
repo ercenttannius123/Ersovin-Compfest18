@@ -1,100 +1,109 @@
-# FabriScan - Fabric Defect Detection System
+# FabriScan - Fabric Defect Detection
 
-Sistem deteksi cacat kain menggunakan Deep Learning (EfficientNet-B0) dengan API FastAPI dan Frontend React.
+Ringkasan singkat dan langkah yang jelas untuk menjalankan proyek ini secara lokal.
 
-## 🎯 Tentang Proyek
+## Tentang
+FabriScan adalah aplikasi untuk mendeteksi cacat kain menggunakan model Deep Learning (EfficientNet-B0). Proyek terdiri dari:
 
-**FabriScan** adalah solusi AI-powered untuk mendeteksi cacat pada kain secara otomatis. Sistem ini menggunakan:
-- **Backend**: FastAPI + PyTorch + EfficientNet-B0
-- **Frontend**: React + TypeScript
-- **Model**: Deep Learning classifier untuk deteksi defect
+- Backend: FastAPI + PyTorch
+- Frontend: React + TypeScript (Vite)
 
-## 📁 Project Structure
+## Struktur Proyek
 
 ```
-Ersovin-Fabriscan/
-├── backend/                  # API FastAPI
-│   ├── main.py              # Aplikasi utama
-│   ├── model/
-│   │   ├── best_model.pth   # Model terlatih
-│   │   └── class_names.json # Daftar class
-│   ├── requirements.txt      # Dependencies
-│   └── README.md            # Setup guide backend
-│
-├── frontend/                # React frontend
-│   ├── src/
-│   ├── public/
-│   ├── package.json
-│   ├── tsconfig.json
-│   ├── vite.config.ts
-│   └── README.md
-│
-├── Pelengkap/              # Supporting files
-│   ├── confusion_matrix.png
-│   └── training_history.png
-│
-├── kaggle.json             # (⚠️ NOT PUSHED - add to .env locally)
+.
+├── backend/                # FastAPI app and model artifacts
+├── frontend/               # React + TypeScript frontend (Vite)
+├── kaggle.json             # (NOT committed - keep locally)
 ├── .gitignore
-└── README.md               # File ini
+└── README.md
 ```
 
-## 🚀 Quick Start
+## Persiapan (Prerequisites)
 
-### Backend
+- Node.js >= 16
+- npm atau pnpm
+- Python 3.9+ dan `pip`
+- Git
+
+Pastikan juga port `8000` (backend) dan `5173` (frontend) tersedia pada mesin lokal.
+
+## Menjalankan Lokal (Development)
+
+1) Backend
+
 ```bash
 cd backend
+python -m venv .venv
+source .venv/bin/activate   # macOS / Linux
+# .venv\Scripts\activate   # Windows (PowerShell)
 pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-API akan berjalan di `http://localhost:8000`
+API akan tersedia di `http://localhost:8000`.
 
-### Frontend
+Contoh endpoint (POST):
+
+```
+POST http://localhost:8000/predict
+Form field: file (image)
+Response: { "class": "defect_type", "confidence": 92.3 }
+```
+
+2) Frontend
+
 ```bash
 cd frontend
 npm install
 npm run dev
 ```
 
-Aplikasi frontend akan berjalan di `http://localhost:5173`
+Frontend dev server biasanya berjalan di `http://localhost:5173`.
 
-## 📚 Dokumentasi
+Jika frontend tidak menemukan backend di `localhost:8000`, buka `frontend/src/config` atau gunakan proxy di `vite.config.ts`.
 
-- [Backend README](./backend/README.md) - Setup, API endpoints, troubleshooting
+## Konfigurasi Sensitif
 
-## 🧠 Model Details
+- Jangan commit `kaggle.json` atau kredensial lainnya. Tambahkan ke `.gitignore` (sudah ada).
+- Jika perlu, gunakan environment variables untuk menyimpan path atau API keys.
 
-- **Architecture**: EfficientNet-B0 (transfer learning)
-- **Input**: Gambar kain 224x224 pixels  
-- **Output**: Klasifikasi + confidence score
-- **Training Data**: Kaggle Fabric Defect Detection Dataset
+## Contributing / Commit Message
 
-## 🔒 Security
+Gunakan format commit singkat yang konsisten. Permintaan kamu: gunakan `feat:` untuk fitur.
 
-**⚠️ IMPORTANT:** 
-- `kaggle.json` contains sensitive credentials
-- File ini **TIDAK** dipush ke GitHub
-- Set di local machine saja atau gunakan environment variables
-- Jika exposed, regenerate API key di https://www.kaggle.com/settings/account
+Contoh pesan commit yang kita pakai di repo ini:
 
-## 📝 Commit Convention
+```
+feat: short description
+fix: short description
+docs: update README
+```
 
-Project mengikuti **Conventional Commits**:
-- `feat:` - Fitur baru
-- `fix:` - Bug fix
-- `docs:` - Dokumentasi
-- `refactor:` - Perubahan struktur
-- `test:` - Testing
+## Troubleshooting
 
-## 👥 Team
+- Jika kamera preview di browser tampil putih: pastikan browser memiliki izin, tutup aplikasi lain yang memakai webcam, dan coba refresh halaman.
+- Jika backend error saat memuat model: pastikan file `backend/model/best_model.pth` ada dan versi PyTorch kompatibel.
 
-**Ersovin - Fabriscan**
-- Compfest 18
+## Menjalankan build/production (opsional)
 
-## 📝 License
+Frontend build:
+```bash
+cd frontend
+npm run build
+```
 
-Private - Untuk keperluan kompetisi
+Backend production (contoh menggunakan Gunicorn + Uvicorn Workers):
+```bash
+# contoh: gunicorn -k uvicorn.workers.UvicornWorker main:app -b 0.0.0.0:8000
+```
+
+## Dokumentasi Lebih Lanjut
+- [Backend README](./backend/README.md)
+
+## Lisensi
+Private — untuk keperluan kompetisi.
 
 ---
 
-Last Updated: 2026-07-27
+Last Updated: 2026-07-28
