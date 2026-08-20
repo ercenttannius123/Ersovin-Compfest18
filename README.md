@@ -1,50 +1,50 @@
-# FabriScan — Deteksi Cacat Kain
+# FabriScan — Fabric Defect Detection
 
 ![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
-Tim: Ersovin · Model: EfficientNet-B0 · Teknologi: FastAPI, React
+Team: Ersovin · Model: EfficientNet-B0 · Tech: FastAPI, React
 
 ---
 
-## Tentang
+## About
 
-FabriScan adalah prototipe aplikasi untuk mendeteksi cacat pada kain secara otomatis. Aplikasi ini terdiri dari:
+FabriScan is a prototype application for automatic fabric defect detection. The project contains:
 
-- Backend: FastAPI + PyTorch untuk inferensi model.
-- Frontend: React + TypeScript (Vite) untuk antarmuka pengguna — unggah/capture gambar dan menampilkan hasil.
+- Backend: FastAPI + PyTorch for model inference.
+- Frontend: React + TypeScript (Vite) for user interface — image upload/capture and prediction display.
 
-Model yang digunakan: EfficientNet-B0 (pretrained / fine-tuned) — file model tidak termasuk di repo (`backend/model/best_model.pth`).
+Model used: EfficientNet-B0 (pretrained / fine-tuned). The model file is not included in this repository (`backend/model/best_model.pth`).
 
-## Fitur
+## Requirements
 
-- Unggah gambar atau ambil foto langsung dari kamera
-- Preview kamera dan tombol capture yang jelas
-- Prediksi kelas cacat kain dengan nilai confidence
-- Backend API FastAPI untuk inferensi
-- Frontend React + TypeScript untuk interaksi pengguna
+- Docker & Docker Compose (optional, recommended for consistent environment)
+- Python 3.10+ (if running backend without Docker)
+- Node.js 18+ / npm (if running frontend without Docker)
 
-## Struktur Proyek
+See "Run with Docker" below for Docker instructions.
 
-```
-Ersovin - Fabriscan/
-├── backend/                # FastAPI app dan model PyTorch
-│   ├── main.py
-│   ├── requirements.txt
-│   └── model/
-├── frontend/               # Vite + React + TypeScript
-│   ├── src/
-│   ├── package.json
-│   └── vite.config.ts
-├── .gitignore
-└── README.md               # File ini
+## Run (Development, without Docker)
+
+1. Backend
+
+```bash
+cd backend
+python -m venv .venv
+# Windows PowerShell
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-> Catatan: `backend/model/best_model.pth` dan `kaggle.json` tidak disertakan di repositori.
+2. Frontend
 
-## Persyaratan
+```bash
+cd frontend
+npm install
+npm run dev
+```
 
-- Docker & Docker Compose (opsional, direkomendasikan untuk menjalankan di lingkungan konsisten)
-- Python 3.10+ (untuk menjalankan backend tanpa Docker)
-- Node.js 18+ / npm (untuk menjalankan frontend tanpa Docker)
+Frontend: http://localhost:5173
+Backend API: http://localhost:8000
 
 Jika ingin menggunakan Docker, lihat bagian "Jalankan dengan Docker" di bawah.
 
@@ -96,31 +96,32 @@ Contoh respons:
 }
 ```
 
-## Jalankan dengan Docker (direkomendasikan untuk GitHub/CI)
 
-Semua file Docker sudah ditambahkan: `backend/Dockerfile`, `frontend/Dockerfile`, dan `docker-compose.yml` di root.
+## Run with Docker (recommended for GitHub/CI)
 
-1. Build dan jalankan:
+Docker files are included: `backend/Dockerfile`, `frontend/Dockerfile`, and `docker-compose.yml` at repository root.
+
+1. Build and run:
 
 ```bash
 docker-compose up --build -d
 ```
 
-2. Periksa log:
+2. View logs:
 
 ```bash
 docker-compose logs -f
 ```
 
-3. Stop dan remove:
+3. Stop and remove:
 
 ```bash
 docker-compose down
 ```
 
-Catatan:
-- Frontend disajikan oleh Nginx pada container port 80, dipetakan ke host `5173` agar konsisten dengan pengaturan development.
-- Jika ingin mount model (tidak menyertakan file model di repo), tambahkan volume pada `docker-compose.yml`:
+Notes:
+- The frontend is served by Nginx inside the container on port 80 and mapped to host port `5173` to match the development setup.
+- To mount the model directory (if the model is not stored in the repo), add a volume mapping to `docker-compose.yml` for the backend service:
 
 ```yaml
 services:
@@ -131,17 +132,17 @@ services:
 
 ## Troubleshooting & Tips
 
-- Preview kamera kosong: periksa izin kamera di browser, tutup aplikasi lain yang mengakses kamera.
-- Model tidak ditemukan: pastikan `backend/model/best_model.pth` berada di folder tersebut sebelum menjalankan (atau mount sebagai volume).
-- CORS: periksa konfigurasi CORS di `backend/main.py` jika frontend gagal mengakses API.
-- Model besar: jika ukuran file model >100 MB, gunakan Git LFS atau jangan commit model — tambahkan instruksi bagaimana mendapatkannya.
+- Camera preview blank: check browser camera permissions and close other apps using the camera.
+- Model not found: ensure `backend/model/best_model.pth` exists before running (or mount it as a volume).
+- CORS: check CORS settings in `backend/main.py` if the frontend cannot access the API.
+- Large model files: if the model file size >100 MB, consider using Git LFS or avoid committing the model; provide instructions to obtain it instead.
 
-## Menyertakan Model di GitHub
+## Including the Model in GitHub
 
-Opsi:
+Options:
 
-1. Jangan commit model; tambahkan instruksi download di README dan mount sebagai volume saat menjalankan Docker.
-2. Jika ingin commit model dan ukurannya besar, gunakan Git LFS:
+1. Do not commit the model; provide download instructions in the README and mount the model directory when running Docker.
+2. If you must commit a large model file, use Git LFS:
 
 ```bash
 git lfs install
@@ -149,24 +150,24 @@ git lfs track "backend/model/*.pth"
 git add .gitattributes
 ```
 
-## Commit & Kontribusi
+## Commit & Contribution
 
-Gunakan format Conventional Commits:
+Use Conventional Commits format:
 
 ```
-feat: fitur baru
-fix: perbaikan bug
-docs: pembaruan dokumentasi
+feat: new feature
+fix: bug fix
+docs: documentation update
 ```
 
-## Struktur Proyek (ringkasan)
+## Project Structure (summary)
 
 ```
 Ersovin - Fabriscan/
-├── backend/                # FastAPI app dan model PyTorch
+├── backend/                # FastAPI app and PyTorch model
 │   ├── main.py
 │   ├── requirements.txt
-│   └── model/              # letakkan best_model.pth di sini atau mount
+│   └── model/              # place best_model.pth here or mount it at runtime
 ├── frontend/               # Vite + React + TypeScript
 │   ├── src/
 │   ├── package.json
@@ -176,10 +177,13 @@ Ersovin - Fabriscan/
 └── .dockerignore
 ```
 
-## Lisensi
+## License
 
-Private — hanya untuk keperluan kompetisi.
+Private — for competition use only.
 
+---
+
+Last updated: 2026-08-20
 ---
 
 Last updated: 2026-08-20
