@@ -164,45 +164,40 @@ git lfs track "backend/model/*.pth"
 git add .gitattributes
 ```
 
-Submission checklist (COMPETITION READY)
+Submission notes (what judges need to run this repo)
 
-Before submitting to the competition/judges, ensure the repository contains or links to the following items:
+This project aims to keep the repository minimal and reproducible. For judges or reviewers, the repository provides:
 
-1) Source code repository (this repo): include `README.md` with clear setup steps and `docker-compose.yml`.
+- Source code for backend and frontend (see `backend/` and `frontend/`).
+- `docker-compose.yml` to run both services together.
+- API example and quick test command in this README.
 
-2) Proof-of-work video (max 7 minutes):
-	 - Upload to YouTube as UNLISTED.
-	 - Naming format: `COMPFEST18 AIC: PROOF OF WORK - [Team Name] - [Project Name]`.
+Important:
 
-3) Innovation video (max 5 minutes):
-	 - Upload to YouTube as PUBLIC.
-	 - Naming format: `COMPFEST18 AIC: [Team Name] - [Project Name]`.
+- The trained model files (`backend/model/best_model.pth` and `backend/model/class_names.json`) are NOT included in the repo. Provide the model to reviewers by one of the following:
+  - Add the files locally before running, or
+  - Host the model externally (Google Drive / GitHub Release) and add a download link in this README, or
+  - Use Git LFS for large files and commit them if permitted.
 
-4) PDF proposal (max 20 pages, excluding cover/references/appendices) containing at least:
-	 - Team name and project title
-	 - Background and motivation
-	 - Goals and benefits
-	 - Methodology: dataset acquisition, model development (per-feature), integration with code/environment
-	 - Other supporting methods/references
-	 - Conclusion
+How to run a quick smoke test (example):
 
-5) Extra: include link to where judges can download the model (if not included in repo), or add instructions to obtain it.
+1) Start services with Docker:
 
-How to present the repository to judges (recommended)
+```bash
+docker-compose up --build -d
+```
 
-- Keep the repository root tidy: `README.md` (this file) + `docker-compose.yml` + per-service README files.
-- In `README.md` provide direct links to the videos and to the PDF proposal (host on Google Drive, GitHub Releases, or similar), or explain how judges can run the app locally with the model mounted.
+2) Test health endpoint:
 
-Security & privacy notes
+```bash
+curl http://localhost:8000/
+```
 
-- Do not commit `kaggle.json` credentials or any private keys — remove them before sharing publicly.
+3) Run a sample prediction (replace `/path/to/image.jpg` and ensure model files are present):
 
-Contributing
+```bash
+curl -X POST "http://localhost:8000/predict" -F "file=@/path/to/image.jpg"
+```
 
-- Use Conventional Commits for changes. Keep PRs small and focused.
+If you want, I can add a small `scripts/` folder with a `download_model.sh` and a sample test image to make judging even easier.
 
-License
-
-Private — for competition use only.
-
-docker-compose down
