@@ -32,25 +32,34 @@ python -m venv .venv
 # Windows PowerShell
 .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+# FabriScan — Fabric Defect Detection
 
-2. Frontend
+![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
+Team: Ersovin · Model: EfficientNet-B0 · Tech: FastAPI, React
+
+---
+
+This repository contains a small prototype for fabric defect detection:
+
+- `backend/` — FastAPI app that loads a PyTorch model and exposes a `/predict` endpoint.
+- `frontend/` — Vite + React app for uploading/capturing images and displaying predictions.
+
+See the service-level READMEs for detailed development and run instructions:
+
+- backend: backend/README.md
+- frontend: frontend/README.md
+
+Quick start (Docker, recommended):
 
 ```bash
-cd frontend
-npm install
-npm run dev
+docker-compose up --build -d
 ```
 
-Frontend: http://localhost:5173
-Backend API: http://localhost:8000
+Open the frontend at `http://localhost:5173`. The backend API is available at `http://localhost:8000`.
 
-Jika ingin menggunakan Docker, lihat bagian "Jalankan dengan Docker" di bawah.
+Run locally (without Docker):
 
-## Menjalankan (Tanpa Docker — development)
-
-1. Backend
+1. Backend (development):
 
 ```bash
 cd backend
@@ -61,7 +70,7 @@ pip install -r requirements.txt
 uvicorn main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-2. Frontend
+2. Frontend (development):
 
 ```bash
 cd frontend
@@ -69,80 +78,11 @@ npm install
 npm run dev
 ```
 
-Frontend: http://localhost:5173
-Backend API: http://localhost:8000
-
-## API Utama
-
-Endpoint: `POST /predict`
-
-- Body: `multipart/form-data`
-- Field: `file` (gambar JPG/PNG/WebP)
-
-Contoh cURL:
-
-```bash
-curl -X POST "http://localhost:8000/predict" \
-  -F "file=@/path/to/image.jpg"
-```
-
-Contoh respons:
-
-```json
-{
-  "predicted_class": "defect free",
-  "confidence": 92.3,
-  "is_defect": false
-}
-```
-
-
-## Run with Docker (recommended for GitHub/CI)
-
-Docker files are included: `backend/Dockerfile`, `frontend/Dockerfile`, and `docker-compose.yml` at repository root.
-
-1. Build and run:
-
-```bash
-docker-compose up --build -d
-```
-
-2. View logs:
-
-```bash
-docker-compose logs -f
-```
-
-3. Stop and remove:
-
-```bash
-docker-compose down
-```
-
 Notes:
-- The frontend is served by Nginx inside the container on port 80 and mapped to host port `5173` to match the development setup.
-- To mount the model directory (if the model is not stored in the repo), add a volume mapping to `docker-compose.yml` for the backend service:
+- The `backend/model/` directory should contain `best_model.pth` and `class_names.json`. These files are not included in the repo by default.
+- Large model files (>100 MB): use Git LFS or host the model externally and mount it into the container at runtime.
 
-```yaml
-services:
-  backend:
-    volumes:
-      - ./backend/model:/app/model:ro
-```
-
-## Troubleshooting & Tips
-
-- Camera preview blank: check browser camera permissions and close other apps using the camera.
-- Model not found: ensure `backend/model/best_model.pth` exists before running (or mount it as a volume).
-- CORS: check CORS settings in `backend/main.py` if the frontend cannot access the API.
-- Large model files: if the model file size >100 MB, consider using Git LFS or avoid committing the model; provide instructions to obtain it instead.
-
-## Including the Model in GitHub
-
-Options:
-
-1. Do not commit the model; provide download instructions in the README and mount the model directory when running Docker.
-2. If you must commit a large model file, use Git LFS:
+Including model with Git LFS (example):
 
 ```bash
 git lfs install
@@ -150,26 +90,22 @@ git lfs track "backend/model/*.pth"
 git add .gitattributes
 ```
 
-## Commit & Contribution
-
-Use Conventional Commits format:
-
-```
-feat: new feature
-fix: bug fix
-docs: documentation update
-```
-
-## Project Structure (summary)
+Project structure (summary):
 
 ```
 Ersovin - Fabriscan/
-├── backend/                # FastAPI app and PyTorch model
-│   ├── main.py
-│   ├── requirements.txt
-│   └── model/              # place best_model.pth here or mount it at runtime
-├── frontend/               # Vite + React + TypeScript
-│   ├── src/
+├── backend/
+├── frontend/
+├── docker-compose.yml
+├── README.md
+└── .dockerignore
+```
+
+License: Private — for competition use only.
+
+---
+
+Last updated: 2026-08-20
 │   ├── package.json
 │   └── vite.config.ts
 ├── docker-compose.yml
