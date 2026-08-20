@@ -10,7 +10,7 @@ import io
 
 app = FastAPI()
 
-# CORS biar Frontend React bisa akses
+# Enable CORS so the React frontend can access the API
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -54,14 +54,14 @@ def root():
 
 @app.post("/predict")
 async def predict(file: UploadFile = File(...)):
-    # Baca gambar
+    # Read image
     contents = await file.read()
     img = Image.open(io.BytesIO(contents)).convert("RGB")
     
     # Preprocessing
     tensor = transform(img).unsqueeze(0)
     
-    # Inferensi
+    # Inference
     with torch.no_grad():
         outputs = model(tensor)
         probs = torch.softmax(outputs, dim=1)
