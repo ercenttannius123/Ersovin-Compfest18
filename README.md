@@ -102,70 +102,44 @@ Last updated: 2026-08-20
 ## Commit dan Kontribusi
 
 Kami menggunakan format Conventional Commits untuk menjaga konsistensi.
+# FabriScan — Fabric Defect Detection
 
-Gunakan:
-
-```
-feat: fitur baru atau perbaikan fungsi
-fix: perbaikan bug
-docs: pembaruan dokumentasi
-```
-
-Contoh:
-
-```
-feat: tambah preview kamera dan tombol capture
-fix: koreksi respons API
-docs: terjemahkan README ke Bahasa Indonesia
-```
-
-## Lisensi
-
-Private — hanya untuk keperluan kompetisi.
+![FabriScan](https://img.shields.io/badge/FabriScan-ready-blue) ![License](https://img.shields.io/badge/license-private-lightgrey)
+Team: Ersovin · Model: EfficientNet-B0 · Tech: FastAPI, React
 
 ---
 
-## Docker (GitHub-ready)
+FabriScan is a prototype for automatic fabric defect detection. The repo includes a frontend UI and a FastAPI backend that serves a PyTorch model.
 
-Panduan singkat untuk menjalankan aplikasi menggunakan Docker dan `docker-compose`. File `docker-compose.yml` sudah tersedia di repository root.
+Repository layout
 
-- Backend: image dibangun dari `./backend` dan menjalankan FastAPI di port `8000`.
-- Frontend: image dibangun dari `./frontend` dan disajikan oleh `nginx` (dipetakan ke host port `5173`).
+- `backend/` — FastAPI service + model artifacts
+- `frontend/` — Vite + React UI
+- `docker-compose.yml` — run both services together
 
-Perintah cepat (di root repository):
+Quick start (Docker, recommended):
 
 ```bash
-# Build & start (detached)
 docker-compose up --build -d
+```
 
-# Lihat log
-docker-compose logs -f
+Open the frontend at: http://localhost:5173
+Backend API: http://localhost:8000
 
-# Stop & remove
+Development (no Docker):
+
+- See `backend/README.md` and `frontend/README.md` for development instructions for each service.
+
+Model files
+
+- Place `best_model.pth` and `class_names.json` inside `backend/model/` before running predictions. These files are not included in the repository.
+- For large model files (>100 MB) use Git LFS or host externally and mount into the container at runtime.
+
+Contributing
+
+- Use Conventional Commits: `feat:`, `fix:`, `docs:`.
+
+License
+
+Private — for competition use only.
 docker-compose down
-```
-
-Catatan untuk GitHub:
-- Pastikan `README.md` dan `docker-compose.yml` ada di repository utama saat push ke GitHub (sudah termasuk).
-- Jika `backend/model/best_model.pth` berukuran besar (>100 MB) pertimbangkan menggunakan Git LFS, atau jangan commit model ke repo dan mount file sebagai volume saat menjalankan container (contoh di bawah).
-
-Contoh mount model saat development (opsional) — tambahkan bagian `volumes` di `docker-compose.yml` untuk `backend`:
-
-```yaml
-services:
-  backend:
-    volumes:
-      - ./backend/model:/app/model:ro
-```
-
-Atau build image yang menyertakan model jika file sudah ada di repository.
-
-Tips untuk publikasi GitHub:
-- Jika model tidak disertakan, tambahkan instruksi pada `README.md` tentang cara mendapatkan model (link/download) dan langkah menaruhnya di `backend/model` sebelum menjalankan `docker-compose up`.
-- Jika model besar, gunakan `git lfs` dan tambahkan instruksi singkat: `git lfs install && git lfs track "backend/model/*.pth"`.
-
-Jika mau, saya bisa menambahkan contoh `workflow` GitHub Actions untuk otomatis build image dan push ke registry.
-
----
-
-Last updated: 2026-08-20
