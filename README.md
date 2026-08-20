@@ -39,70 +39,39 @@ Team: Ersovin · Model: EfficientNet-B0 · Tech: FastAPI, React
 
 ---
 
-This repository contains a small prototype for fabric defect detection:
+This repository contains a prototype for fabric defect detection.
 
-- `backend/` — FastAPI app that loads a PyTorch model and exposes a `/predict` endpoint.
-- `frontend/` — Vite + React app for uploading/capturing images and displaying predictions.
+Structure
 
-See the service-level READMEs for detailed development and run instructions:
+- `backend/` — FastAPI service that loads a PyTorch model and exposes a `/predict` endpoint.
+- `frontend/` — Vite + React app for uploading/capturing images and showing predictions.
 
-- backend: backend/README.md
-- frontend: frontend/README.md
+Quick start
 
-Quick start (Docker, recommended):
+1) With Docker (recommended):
 
 ```bash
 docker-compose up --build -d
 ```
 
-Open the frontend at `http://localhost:5173`. The backend API is available at `http://localhost:8000`.
+Open the app at: http://localhost:5173
+API: http://localhost:8000
 
-Run locally (without Docker):
+2) Without Docker (development): see per-service READMEs:
 
-1. Backend (development):
+- backend: backend/README.md
+- frontend: frontend/README.md
 
-```bash
-cd backend
-python -m venv .venv
-# Windows PowerShell
-.venv\Scripts\Activate.ps1
-pip install -r requirements.txt
-uvicorn main:app --reload --host 0.0.0.0 --port 8000
-```
+Notes
 
-2. Frontend (development):
-
-```bash
-cd frontend
-npm install
-npm run dev
-```
-
-Notes:
-- The `backend/model/` directory should contain `best_model.pth` and `class_names.json`. These files are not included in the repo by default.
-- Large model files (>100 MB): use Git LFS or host the model externally and mount it into the container at runtime.
-
-Including model with Git LFS (example):
-
-```bash
-git lfs install
-git lfs track "backend/model/*.pth"
-git add .gitattributes
-```
-
-Project structure (summary):
-
-```
-Ersovin - Fabriscan/
-├── backend/
-├── frontend/
-├── docker-compose.yml
-├── README.md
-└── .dockerignore
-```
+- The `backend/model/` directory must contain `best_model.pth` and `class_names.json` before running predictions. These files are not included in the repository.
+- If model files are large, consider using Git LFS or hosting the model externally and mounting it into the container at runtime.
 
 License: Private — for competition use only.
 
+---
+
+Last updated: 2026-08-20
 ---
 
 Last updated: 2026-08-20
