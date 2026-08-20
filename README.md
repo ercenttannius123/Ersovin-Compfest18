@@ -39,39 +39,45 @@ Team: Ersovin · Model: EfficientNet-B0 · Tech: FastAPI, React
 
 ---
 
-This repository contains a prototype for fabric defect detection.
+This repository contains a prototype for fabric defect detection. It is designed to be simple to run locally or in Docker for demonstrations and evaluation.
 
-Structure
+Features
 
-- `backend/` — FastAPI service that loads a PyTorch model and exposes a `/predict` endpoint.
-- `frontend/` — Vite + React app for uploading/capturing images and showing predictions.
+- Image upload and camera capture UI (React + Vite)
+- FastAPI backend serving PyTorch model for inference
+- Ready-to-use Docker setup for quick deployment
 
-Quick start
+Repository layout
 
-1) With Docker (recommended):
+- `backend/` — FastAPI service and model artifacts
+- `frontend/` — Vite + React user interface
+- `docker-compose.yml` — compose file to run both services together
+
+Quick start (recommended)
 
 ```bash
 docker-compose up --build -d
+
+# frontend: http://localhost:5173
+# backend:  http://localhost:8000
 ```
 
-Open the app at: http://localhost:5173
-API: http://localhost:8000
+Development (without Docker)
 
-2) Without Docker (development): see per-service READMEs:
+- See `backend/README.md` and `frontend/README.md` for individual service development instructions.
 
-- backend: backend/README.md
-- frontend: frontend/README.md
+Model files
 
-Notes
+- Place `best_model.pth` and `class_names.json` inside `backend/model/` before running predictions. These files are intentionally excluded from the repository.
+- For large model files use Git LFS or host externally and mount into the container at runtime.
 
-- The `backend/model/` directory must contain `best_model.pth` and `class_names.json` before running predictions. These files are not included in the repository.
-- If model files are large, consider using Git LFS or hosting the model externally and mounting it into the container at runtime.
+Contributing
 
-License: Private — for competition use only.
+- Use Conventional Commits for changes: `feat:`, `fix:`, `docs:`.
 
----
+License
 
-Last updated: 2026-08-20
+Private — for competition use only.
 ---
 
 Last updated: 2026-08-20
