@@ -75,12 +75,6 @@ Contributing
 
 - Use Conventional Commits for changes: `feat:`, `fix:`, `docs:`.
 
-License
-
-Private — for competition use only.
----
-
-Last updated: 2026-08-20
 │   ├── package.json
 │   └── vite.config.ts
 ├── docker-compose.yml
